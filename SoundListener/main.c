@@ -1,5 +1,7 @@
 #include "soundlistener.h"
 
+#define RECOGNITION_DISABLE
+
 #define MAX_COUNT 10000000
 #define MAX_BUFFER_SIZE 500
 
@@ -23,6 +25,7 @@ int main(int argc, char *argv[])
   soundData = (char *)malloc(sizeof(char)*filesize);
 
 
+#ifndef RECOGNITION_DISABLE
   /* if no argument, output usage and exit */
   if (argc == 1) {
     fprintf(stderr, "Julius rev.%s - based on ", JULIUS_VERSION);
@@ -32,9 +35,6 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  /************/
-  /* Start up */
-  /************/
  
   /* 1. load configurations from command arguments */
   jconf = j_config_load_args_new(argc, argv);
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
 
   /* output system information to log */
   j_recog_info(recog);
+#endif
 
 
   /*
-   * JULIUS INITIALIZATION END
    * SOCKET INITIALIZATIOn START
    */
 
@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
   /***********************************/
 
   /* raw speech input (microphone etc.) */
-#if 0
-  switch(j_open_stream(recog, NULL)) {
+#ifndef RECOGNISTION_DISABLE
+ switch(j_open_stream(recog, NULL)) {
     case 0:			/* succeeded */
       break;
     case -1:      		/* error */
@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
     }
     count++;
 
+#ifndef RECOGNITION_DISABLE
     // RAWデータをアドインバッファへコピー
     memcpy(recog->adin->buffer, buffer, (filesize/sizeof(SP16))*sizeof(SP16));
     // // アドインパラメータを設定
@@ -141,17 +142,15 @@ int main(int argc, char *argv[])
     /* finish after whole input has been processed and input reaches end */
     ret = j_recognize_stream(recog);
     if (ret == -1) return -1;	/* error */
-    output_result(recog, (void*)NULL);
+#endif
   }  
-  /*******/
-  /* End */
-  /*******/
 
+#ifndef RECOGNITION_DISABLE
   /* calling j_close_stream(recog) at any time will terminate
      recognition and exit j_recognize_stream() */
   j_close_stream(recog);
-
   j_recog_free(recog);
+#endif
 
   fclose(fp);
   close(sock);

@@ -12,4 +12,4 @@ all: $(OBJS)
 	$(CC) -c $^ -o $@ $(CFLAGS) $(EXTRA_LIBS)
 
 clean:
-	rm -f *.o soundlistener
+	rm -f *.o soundlistener rec.raw
